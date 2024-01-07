@@ -14,6 +14,14 @@ import java.util.List;
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
+    @ControllerAdvice
+    public static class GlobalExceptionHandler {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -41,7 +49,7 @@ public class EmployeeController {
     @PutMapping("{id}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable long id, @RequestBody Employee employeeDetails) {
         Employee updateEmployee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id:" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not exist with id: " + id));
         //Setting the employee details with new values
         updateEmployee.setFirstName(employeeDetails.getFirstName());
         updateEmployee.setLastName(employeeDetails.getLastName());
